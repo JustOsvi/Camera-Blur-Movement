@@ -1,0 +1,30 @@
+local HeartBeat = game:GetService("RunService").Heartbeat
+
+local m = {}
+
+m.Active = true
+
+function m.Start()
+	if not m.Active then return end
+	local Camera = workspace.CurrentCamera
+	local Blur = Instance.new("BlurEffect", game.Lighting)
+	Blur.Name = "MovementBlurEffect"
+	local oldPosition = Camera.CFrame
+	local newPosition
+	local newThread = coroutine.create(function()
+		while true do
+			if not m.Active then break end
+			oldPosition = Camera.CFrame
+			HeartBeat:Wait()
+			if not m.Active then break end
+			newPosition = Camera.CFrame
+			local axis, angle = (newPosition * oldPosition:Inverse()):ToAxisAngle()
+			local conv = math.clamp(angle*20, 0, 45)
+			Blur.Size = conv
+		end
+		Blur:Destroy()
+	end)
+	coroutine.resume(newThread)
+end
+
+return m
